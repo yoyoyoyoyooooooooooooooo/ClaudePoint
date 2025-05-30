@@ -7,34 +7,9 @@
  * GitHub: https://github.com/Andycufari/ClaudePoint
  */
 
-// Check if running as MCP server
-const isMCP = process.argv.includes('--mcp');
-
-if (isMCP) {
-  // Run as MCP server
-  const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
-  const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
-  const CheckpointManager = require('./lib/checkpoint-manager.js');
-  runMCPServer();
-} else {
-  // Show help
-  console.log('ClaudePoint - The safest way to experiment with Claude Code');
-  console.log('');
-  console.log('Usage:');
-  console.log('  claudepoint --mcp          # Run as MCP server');
-  console.log('  claudepoint setup          # Setup in current project');
-  console.log('  claudepoint create         # Create checkpoint');
-  console.log('  claudepoint list           # List checkpoints');
-  console.log('  claudepoint restore <n>    # Restore checkpoint');
-  console.log('');
-  console.log('For CLI usage, see: claudepoint --help');
-  process.exit(0);
-}
-
-function runMCPServer() {
-  const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
-  const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
-  const CheckpointManager = require('./lib/checkpoint-manager.js');
+const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
+const CheckpointManager = require('./lib/checkpoint-manager.js');
 
 class ClaudePointMCPServer {
   constructor() {
@@ -110,6 +85,14 @@ class ClaudePointMCPServer {
               type: 'object',
               properties: {}
             }
+          },
+          {
+            name: 'get_changelog',
+            description: 'Get development history and changelog of all checkpoint activities',
+            inputSchema: {
+              type: 'object',
+              properties: {}
+            }
           }
         ]
       };
@@ -132,6 +115,9 @@ class ClaudePointMCPServer {
           
           case 'setup_claudepoint':
             return await this.handleSetup(args);
+          
+          case 'get_changelog':
+            return await this.handleGetChangelog(args);
           
           default:
             throw new Error(`Unknown tool: ${name}`);
@@ -195,6 +181,56 @@ class ClaudePointMCPServer {
           {
             type: 'text',
             text: `❌ Error creating checkpoint: ${error.message}`
+          }
+        ]
+      };
+    }
+  }
+
+  async handleGetChangelog(args) {
+    try {
+      const changelog = await this.manager.getChangelog();
+      
+      if (changelog.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: '📋 No development history found. Start creating checkpoints to build your project timeline!'
+            }
+          ]
+        };
+      }
+
+      let output = `📋 Development History (${changelog.length} entries):\n\n`;
+      
+      changelog.slice(0, 10).forEach((entry, index) => {
+        output += `${index + 1}. **${entry.action}** - ${entry.timestamp}\n`;
+        output += `   ${entry.description}\n`;
+        if (entry.details) {
+          output += `   _${entry.details}_\n`;
+        }
+        output += '\n';
+      });
+
+      if (changelog.length > 10) {
+        output += `... and ${changelog.length - 10} more entries. Use CLI 'claudepoint changelog' for full history.`;
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: output
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ Error getting changelog: ${error.message}`
           }
         ]
       };
@@ -383,14 +419,10 @@ class ClaudePointMCPServer {
 }
 
 // Start the server
-if (require.main === module) {
-  const server = new ClaudePointMCPServer();
-  server.start().catch(error => {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  });
-}
+const server = new ClaudePointMCPServer();
+server.start().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
 
 module.exports = ClaudePointMCPServer;
-
-} // End of runMCPServer function

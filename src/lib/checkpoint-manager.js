@@ -8,6 +8,7 @@ class CheckpointManager {
     this.checkpointDir = path.join(this.projectRoot, '.checkpoints');
     this.snapshotsDir = path.join(this.checkpointDir, 'snapshots');
     this.configFile = path.join(this.checkpointDir, 'config.json');
+    this.changelogFile = path.join(this.checkpointDir, 'changelog.json');
   }
 
   async ensureDirectories() {
@@ -243,6 +244,9 @@ class CheckpointManager {
       // Cleanup old checkpoints
       await this.cleanupOldCheckpoints();
       
+      // Log to changelog
+      await this.logToChangelog('CREATE_CHECKPOINT', `Created checkpoint: ${checkpointName}`, manifest.description);
+      
       return {
         success: true,
         name: checkpointName,
@@ -317,6 +321,9 @@ class CheckpointManager {
 
       // Clean up empty directories
       await this.cleanupEmptyDirectories();
+
+      // Log to changelog
+      await this.logToChangelog('RESTORE_CHECKPOINT', `Restored checkpoint: ${checkpoint.name}`, `Emergency backup: ${emergencyName}`);
 
       return {
         success: true,
@@ -413,6 +420,52 @@ class CheckpointManager {
     }
     
     return `${size.toFixed(1)}${units[unitIndex]}`;
+  }
+
+  async logToChangelog(action, description, details = null) {
+    try {
+      let changelog = [];
+      try {
+        const changelogData = await fs.readFile(this.changelogFile, 'utf8');
+        changelog = JSON.parse(changelogData);
+      } catch (error) {
+        // File doesn't exist yet, start with empty array
+      }
+
+      const entry = {
+        timestamp: new Date().toISOString(),
+        action,
+        description,
+        details
+      };
+
+      changelog.unshift(entry); // Add to beginning
+      
+      // Keep only last 50 entries
+      if (changelog.length > 50) {
+        changelog = changelog.slice(0, 50);
+      }
+
+      await fs.writeFile(this.changelogFile, JSON.stringify(changelog, null, 2));
+    } catch (error) {
+      // Don't fail the main operation if changelog fails
+      console.error('Warning: Could not update changelog:', error.message);
+    }
+  }
+
+  async getChangelog() {
+    try {
+      const changelogData = await fs.readFile(this.changelogFile, 'utf8');
+      const changelog = JSON.parse(changelogData);
+      
+      // Format timestamps for display
+      return changelog.map(entry => ({
+        ...entry,
+        timestamp: new Date(entry.timestamp).toLocaleString()
+      }));
+    } catch (error) {
+      return [];
+    }
   }
 }
 
