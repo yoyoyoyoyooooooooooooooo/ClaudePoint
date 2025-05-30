@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * ClaudePoint MCP Server Entry Point
- * Detects if running via Claude Code MCP (stdio) or CLI
+ * ClaudePoint Entry Point
+ * Detects if running via Claude Code MCP or as CLI
  */
 
-// Detect if running as MCP server (stdin/stdout communication)
-const isStdio = !process.stdin.isTTY || process.argv.includes('--stdio');
+// Check if this is running as an MCP server
+// MCP servers communicate via stdin/stdout, so we check for TTY
+const isMCPServer = !process.stdin.isTTY && !process.stdout.isTTY;
 
-if (isStdio) {
+if (isMCPServer) {
   // Running as MCP server via Claude Code
   require('../src/mcp-server.js');
 } else {

@@ -12,7 +12,7 @@ const inquirer = require('inquirer');
 program
   .name('claudepoint')
   .description('The safest way to experiment with Claude Code')
-  .version('1.0.0');
+  .version('1.1.1');
 
 program
   .command('setup')
@@ -199,6 +199,22 @@ program
       });
     } catch (error) {
       console.error(chalk.red('❌ Changelog failed:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('log <description>')
+  .description('Add a custom entry to the development history')
+  .option('-d, --details <details>', 'Detailed explanation of changes')
+  .option('-t, --type <type>', 'Action type (CODE_CHANGE, REFACTOR, BUG_FIX, etc.)', 'CODE_CHANGE')
+  .action(async (description, options) => {
+    try {
+      const manager = new CheckpointManager();
+      await manager.logToChangelog(options.type, description, options.details);
+      console.log(chalk.green(`✅ Changelog entry added: ${description}`));
+    } catch (error) {
+      console.error(chalk.red('❌ Log failed:'), error.message);
       process.exit(1);
     }
   });

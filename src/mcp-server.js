@@ -9,6 +9,10 @@
 
 const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
+const { 
+  CallToolRequestSchema, 
+  ListToolsRequestSchema 
+} = require('@modelcontextprotocol/sdk/types.js');
 const CheckpointManager = require('./lib/checkpoint-manager.js');
 
 class ClaudePointMCPServer {
@@ -16,7 +20,7 @@ class ClaudePointMCPServer {
     this.server = new Server(
       {
         name: 'claudepoint',
-        version: '1.0.0',
+        version: '1.1.1',
       },
       {
         capabilities: {
@@ -31,7 +35,7 @@ class ClaudePointMCPServer {
 
   setupToolHandlers() {
     // List available tools
-    this.server.setRequestHandler('tools/list', async () => {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
           {
@@ -93,13 +97,36 @@ class ClaudePointMCPServer {
               type: 'object',
               properties: {}
             }
+          },
+          {
+            name: 'set_changelog',
+            description: 'Add a custom entry to the development history (for Claude Code to log what changes were made)',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                description: {
+                  type: 'string',
+                  description: 'Brief description of what changes were made'
+                },
+                details: {
+                  type: 'string',
+                  description: 'Optional detailed explanation of the changes'
+                },
+                action_type: {
+                  type: 'string',
+                  description: 'Type of action (e.g., REFACTOR, ADD_FEATURE, BUG_FIX, OPTIMIZATION)',
+                  default: 'CODE_CHANGE'
+                }
+              },
+              required: ['description']
+            }
           }
         ]
       };
     });
 
     // Handle tool calls
-    this.server.setRequestHandler('tools/call', async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
       try {
@@ -119,6 +146,9 @@ class ClaudePointMCPServer {
           case 'get_changelog':
             return await this.handleGetChangelog(args);
           
+          case 'set_changelog':
+            return await this.handleSetChangelog(args);
+          
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -137,7 +167,7 @@ class ClaudePointMCPServer {
   }
 
   async handleCreateCheckpoint(args) {
-    const { name, description } = args;
+    const { name, description } = args || {};
     
     try {
       await this.manager.ensureDirectories();
@@ -181,6 +211,43 @@ class ClaudePointMCPServer {
           {
             type: 'text',
             text: `❌ Error creating checkpoint: ${error.message}`
+          }
+        ]
+      };
+    }
+  }
+
+  async handleSetChangelog(args) {
+    const { description, details, action_type = 'CODE_CHANGE' } = args || {};
+    
+    if (!description) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: '❌ Error: Description is required for changelog entry'
+          }
+        ]
+      };
+    }
+
+    try {
+      await this.manager.logToChangelog(action_type, description, details);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `✅ Changelog entry added: ${description}`
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ Error adding changelog entry: ${error.message}`
           }
         ]
       };
@@ -282,7 +349,7 @@ class ClaudePointMCPServer {
   }
 
   async handleRestoreCheckpoint(args) {
-    const { checkpoint, dry_run = false } = args;
+    const { checkpoint, dry_run = false } = args || {};
     
     try {
       const checkpoints = await this.manager.getCheckpoints();
@@ -379,6 +446,7 @@ class ClaudePointMCPServer {
         output += '  • create_checkpoint - Create a new checkpoint\n';
         output += '  • list_checkpoints - See all checkpoints\n';
         output += '  • restore_checkpoint - Restore a previous state\n';
+        output += '  • get_changelog - View development history\n';
         output += '\n💡 Tip: Always create a checkpoint before major changes!';
         
         return {
@@ -415,6 +483,7 @@ class ClaudePointMCPServer {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     console.error('ClaudePoint MCP server running on stdio');
+    console.error('Available tools: setup_claudepoint, create_checkpoint, list_checkpoints, restore_checkpoint, get_changelog, set_changelog');
   }
 }
 
