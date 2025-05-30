@@ -1,0 +1,9 @@
+
+# ClaudPoint checkpoint system
+.checkpoints/
+
+# node_modules
+node_modules/
+
+#avoid .prompts
+.prompts/
